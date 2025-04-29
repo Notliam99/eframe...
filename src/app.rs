@@ -1,7 +1,3 @@
-use std::usize;
-
-use egui::{Color32, Modal, RichText};
-
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 #[serde(default)]
 pub struct Person {
@@ -35,13 +31,13 @@ impl Default for Person {
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
-pub struct WhoIsPhoneApp {
+pub struct WhoHasPhoneApp {
     people: Vec<Person>,
     add_person_modal_open: bool,
     mut_person: Person,
 }
 
-impl Default for WhoIsPhoneApp {
+impl Default for WhoHasPhoneApp {
     fn default() -> Self {
         Self {
             people: Vec::new(),
@@ -51,7 +47,7 @@ impl Default for WhoIsPhoneApp {
     }
 }
 
-impl WhoIsPhoneApp {
+impl WhoHasPhoneApp {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         // This is also where you can customize the look and feel of egui using
@@ -67,7 +63,7 @@ impl WhoIsPhoneApp {
     }
 }
 
-impl eframe::App for WhoIsPhoneApp {
+impl eframe::App for WhoHasPhoneApp {
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, eframe::APP_KEY, self);
@@ -79,7 +75,7 @@ impl eframe::App for WhoIsPhoneApp {
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
         if self.add_person_modal_open {
-            let add_person_modal = Modal::new(egui::Id::new("Add Person")).show(ctx, |ui| {
+            let add_person_modal = egui::Modal::new(egui::Id::new("Add Person")).show(ctx, |ui| {
                 ui.set_width(350f32);
 
                 ui.heading("Add Person");
@@ -105,7 +101,7 @@ impl eframe::App for WhoIsPhoneApp {
                 if ui.button("Submit").clicked() {
                     self.people.push(self.mut_person.clone());
                     self.mut_person = Person::default();
-                    println!("{:?}", &self.people);
+                    log::info!("{:?}", &self.people);
                 }
             });
 
