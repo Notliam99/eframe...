@@ -146,62 +146,70 @@ impl eframe::App for WhoHasPhoneApp {
             ui.separator();
             ui.add_space(6.0);
 
-            for i in self.people.clone() {
-                egui::Frame::new()
-                    .stroke(egui::Stroke::new(1.0, Color32::GRAY))
-                    .corner_radius(egui::CornerRadius::same(8))
-                    .inner_margin(egui::Margin::same(8))
-                    .show(ui, |ui| {
-                        ui.label(egui::RichText::new(&i.name.to_string()).strong().heading())
-                            .on_hover_text(RichText::new("Person's Name"));
+            egui::ScrollArea::vertical().show(ui, |ui| {
+                for i in self.people.clone() {
+                    egui::Frame::new()
+                        .stroke(egui::Stroke::new(1.0, egui::Color32::GRAY))
+                        .corner_radius(egui::CornerRadius::same(8))
+                        .inner_margin(egui::Margin::same(8))
+                        .show(ui, |ui| {
+                            ui.label(egui::RichText::new(&i.name.to_string()).strong().heading())
+                                .on_hover_text(egui::RichText::new("Person's Name"));
 
-                        ui.separator();
+                            ui.separator();
 
-                        ui.horizontal(|ui| {
-                            ui.label("Age:")
-                                .on_hover_text(RichText::new("Person's Age In Years"));
-                            ui.label(egui::RichText::new(&i.age.to_string()).strong())
-                                .on_hover_text(RichText::new("Person's Age In Years"));
-                        });
+                            ui.horizontal(|ui| {
+                                ui.label("Age:")
+                                    .on_hover_text(egui::RichText::new("Person's Age In Years"));
+                                ui.label(egui::RichText::new(&i.age.to_string()).strong())
+                                    .on_hover_text(egui::RichText::new("Person's Age In Years"));
+                            });
 
-                        ui.horizontal(|ui| {
-                            ui.label("Has Phone:")
-                                .on_hover_text(RichText::new("Dose This Person Have A Phone"));
+                            ui.horizontal(|ui| {
+                                ui.label("Has Phone:").on_hover_text(egui::RichText::new(
+                                    "Dose This Person Have A Phone",
+                                ));
 
-                            if i.has_phone.clone() {
-                                ui.label(
-                                    egui::RichText::new("Yes")
-                                        .strong()
-                                        .color(egui::Color32::LIGHT_GREEN),
-                                )
-                                .on_hover_text(RichText::new("Person Has A Phone"));
-                            } else {
-                                ui.label(
-                                    egui::RichText::new("No")
-                                        .strong()
-                                        .color(egui::Color32::LIGHT_RED),
-                                )
-                                .on_hover_text(RichText::new("Person Dose Not Have Phone"));
+                                if i.has_phone.clone() {
+                                    ui.label(
+                                        egui::RichText::new("Yes")
+                                            .strong()
+                                            .color(egui::Color32::LIGHT_GREEN),
+                                    )
+                                    .on_hover_text(egui::RichText::new("Person Has A Phone"));
+                                } else {
+                                    ui.label(
+                                        egui::RichText::new("No")
+                                            .strong()
+                                            .color(egui::Color32::LIGHT_RED),
+                                    )
+                                    .on_hover_text(
+                                        egui::RichText::new("Person Dose Not Have Phone"),
+                                    );
+                                }
+                            });
+
+                            if ui
+                                .button("Delete")
+                                .on_hover_text(egui::RichText::new("Remove Person"))
+                                .clicked()
+                            {
+                                match &self.people.iter().position(|x| x == &i) {
+                                    Some(index) => {
+                                        log::info!(
+                                            "Removed [{:?}]",
+                                            &mut self.people.remove(*index)
+                                        )
+                                    }
+                                    None => {
+                                        log::warn!("Not Found");
+                                    }
+                                }
                             }
                         });
-
-                        if ui
-                            .button("Delete")
-                            .on_hover_text(RichText::new("Remove Person"))
-                            .clicked()
-                        {
-                            match &self.people.iter().position(|x| x == &i) {
-                                Some(index) => {
-                                    println!("Removed [{:?}]", &mut self.people.remove(*index))
-                                }
-                                None => {
-                                    println!("Not Found");
-                                }
-                            }
-                        }
-                    });
-                ui.add_space(3.0);
-            }
+                    ui.add_space(3.0);
+                }
+            });
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                 egui::warn_if_debug_build(ui);
