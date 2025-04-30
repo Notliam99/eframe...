@@ -213,14 +213,10 @@ impl eframe::App for WhoHasPhoneApp {
                                 // NOTE: Find Index Of Item In [`Vec`]
                                 match &self.people.iter().position(|x| x == &i) {
                                     Some(index) => {
-                                        log::info!(
-                                            "Removed [{:?}]",
-                                            // NOTE: Removing Item
-                                            &mut self.people.remove(*index)
-                                        )
+                                        println!("Removed [{:?}]", &mut self.people.remove(*index))
                                     }
                                     None => {
-                                        log::warn!("Not Found");
+                                        println!("Not Found");
                                     }
                                 }
                             }
