@@ -1,3 +1,4 @@
+/// [`Person`] Stores Info About A Single Person
 #[derive(serde::Deserialize, serde::Serialize, Clone, Debug)]
 #[serde(default)]
 pub struct Person {
@@ -6,18 +7,21 @@ pub struct Person {
     has_phone: bool,
 }
 
-impl Into<egui::WidgetText> for Person {
-    fn into(self) -> egui::WidgetText {
-        egui::WidgetText::RichText(egui::RichText::new(self.name))
+/// Conversion From [`Person`] To [`egui::WidgetText`]
+impl From<Person> for egui::WidgetText {
+    fn from(value: Person) -> Self {
+        egui::WidgetText::RichText(egui::RichText::new(value.name))
     }
 }
 
+/// Comparson Of Two & [`Person`] structs
 impl PartialEq for &Person {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name && self.age == other.age && self.has_phone == other.has_phone
     }
 }
 
+/// [`Default`] Values For A [`Person`]
 impl Default for Person {
     fn default() -> Self {
         Self {
@@ -37,6 +41,7 @@ pub struct WhoHasPhoneApp {
     mut_person: Person,
 }
 
+/// [`Default`] values for [`WhoHasPhoneApp`]
 impl Default for WhoHasPhoneApp {
     fn default() -> Self {
         Self {
@@ -47,6 +52,7 @@ impl Default for WhoHasPhoneApp {
     }
 }
 
+/// Describing Sesion Storage
 impl WhoHasPhoneApp {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
@@ -63,6 +69,7 @@ impl WhoHasPhoneApp {
     }
 }
 
+/// Main struct [`egui::App`]
 impl eframe::App for WhoHasPhoneApp {
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
@@ -131,7 +138,6 @@ impl eframe::App for WhoHasPhoneApp {
                             ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                         }
                     });
-                    // ui.add_space(16.0);
                 }
 
                 ui.with_layout(egui::Layout::top_down_justified(egui::Align::RIGHT), |ui| {
@@ -141,36 +147,45 @@ impl eframe::App for WhoHasPhoneApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            // The central panel the region left after adding TopPanel's and SidePanel's
+            // NOTE: App Heading
             ui.label(egui::RichText::new("People").size(24.0).strong());
             ui.separator();
             ui.add_space(6.0);
 
+            // NOTE: List Of People
             egui::ScrollArea::vertical().show(ui, |ui| {
+                // NOTE: Iterates Over Every Person In [`Vec`]
                 for i in self.people.clone() {
+                    // NOTE: person widget essentialy
                     egui::Frame::new()
                         .stroke(egui::Stroke::new(1.0, egui::Color32::GRAY))
                         .corner_radius(egui::CornerRadius::same(8))
                         .inner_margin(egui::Margin::same(8))
                         .show(ui, |ui| {
-                            ui.label(egui::RichText::new(&i.name.to_string()).strong().heading())
+                            // NOTE: Name
+                            ui.label(egui::RichText::new(i.name.to_string()).strong().heading())
                                 .on_hover_text(egui::RichText::new("Person's Name"));
-
                             ui.separator();
 
+                            // NOTE: Age
                             ui.horizontal(|ui| {
+                                // NOTE: label
                                 ui.label("Age:")
                                     .on_hover_text(egui::RichText::new("Person's Age In Years"));
-                                ui.label(egui::RichText::new(&i.age.to_string()).strong())
+                                // NOTE: value
+                                ui.label(egui::RichText::new(i.age.to_string()).strong())
                                     .on_hover_text(egui::RichText::new("Person's Age In Years"));
                             });
 
+                            // NOTE: Phone
                             ui.horizontal(|ui| {
+                                // NOTE: Lable
                                 ui.label("Has Phone:").on_hover_text(egui::RichText::new(
                                     "Dose This Person Have A Phone",
                                 ));
 
-                                if i.has_phone.clone() {
+                                // NOTE: Check For Phone
+                                if i.has_phone {
                                     ui.label(
                                         egui::RichText::new("Yes")
                                             .strong()
@@ -189,15 +204,18 @@ impl eframe::App for WhoHasPhoneApp {
                                 }
                             });
 
+                            // NOTE: Delete Button Removes Person
                             if ui
                                 .button("Delete")
                                 .on_hover_text(egui::RichText::new("Remove Person"))
                                 .clicked()
                             {
+                                // NOTE: Find Index Of Item In [`Vec`]
                                 match &self.people.iter().position(|x| x == &i) {
                                     Some(index) => {
                                         log::info!(
                                             "Removed [{:?}]",
+                                            // NOTE: Removing Item
                                             &mut self.people.remove(*index)
                                         )
                                     }
@@ -211,6 +229,7 @@ impl eframe::App for WhoHasPhoneApp {
                 }
             });
 
+            // NOTE: Debug Identifyer
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
                 egui::warn_if_debug_build(ui);
             });
